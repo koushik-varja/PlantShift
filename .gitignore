@@ -1,0 +1,14 @@
+.env
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+frontend/dist/
+*.db
+*.pyc
+ml/artifacts/*.joblib
+benchmarks/results/*.tmp
+.DS_Store

@@ -1,0 +1,112 @@
+{
+  "precision": 0.18155619596541786,
+  "recall": 0.225,
+  "f1": 0.20095693779904306,
+  "roc_auc": 0.7914727000747943,
+  "pr_auc": 0.16476642718612472,
+  "confusion_matrix": [
+    [
+      4491,
+      284
+    ],
+    [
+      217,
+      63
+    ]
+  ],
+  "feature_importance": [
+    {
+      "feature": "temp_roll3",
+      "importance": 0.22525891382262186
+    },
+    {
+      "feature": "vibration_roll3",
+      "importance": 0.20543734469352715
+    },
+    {
+      "feature": "temperature_c",
+      "importance": 0.130536082950377
+    },
+    {
+      "feature": "vibration_mm_s",
+      "importance": 0.10830915676472708
+    },
+    {
+      "feature": "cycle_count",
+      "importance": 0.10039657314945384
+    },
+    {
+      "feature": "energy_kw",
+      "importance": 0.08114277506633073
+    },
+    {
+      "feature": "energy_roll3",
+      "importance": 0.06851844714592094
+    },
+    {
+      "feature": "rpm",
+      "importance": 0.029738018866329693
+    },
+    {
+      "feature": "vibration_std3",
+      "importance": 0.02555545469031547
+    },
+    {
+      "feature": "temp_trend3",
+      "importance": 0.024704845452967267
+    },
+    {
+      "feature": "load",
+      "importance": 0.00040238739742887186
+    }
+  ],
+  "features": [
+    "vibration_mm_s",
+    "temperature_c",
+    "load",
+    "rpm",
+    "energy_kw",
+    "cycle_count",
+    "vibration_roll3",
+    "vibration_std3",
+    "temp_roll3",
+    "temp_trend3",
+    "energy_roll3"
+  ],
+  "latent_wear_used_as_feature": false,
+  "train_rows": 10948,
+  "validation_rows": 2090,
+  "test_rows": 5055,
+  "decision_threshold": 0.8,
+  "positive_rate_train": 0.058823529411764705,
+  "positive_rate_test": 0.05539070227497527,
+  "split": "whole-run chronological split, approximately 60/10/30; threshold chosen on validation only",
+  "train_runs": [
+    "ml-0",
+    "ml-1",
+    "ml-2",
+    "ml-3",
+    "ml-4",
+    "ml-5",
+    "ml-6",
+    "ml-7",
+    "ml-8",
+    "ml-9",
+    "ml-10"
+  ],
+  "validation_runs": [
+    "ml-11",
+    "ml-12"
+  ],
+  "test_runs": [
+    "ml-13",
+    "ml-14",
+    "ml-15",
+    "ml-16",
+    "ml-17"
+  ],
+  "run_overlap": false,
+  "label": "failure within next five same-run/same-machine telemetry events; synthetic ground truth",
+  "synthetic_data": true,
+  "model_version": "failure-risk-rf-v2-observable"
+}

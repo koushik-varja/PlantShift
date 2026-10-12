@@ -1,0 +1,7 @@
+{
+  "status": "NOT_EXECUTED",
+  "timestamp_utc": "2026-10-12T13:49:49.748768+00:00",
+  "reason": "Docker is not installed in the final-v6 verification environment, so Mosquitto/PostgreSQL/Timescale and the Compose E2E path could not be executed. No end-to-end values are fabricated.",
+  "path": "simulator -> MQTT -> bounded batching/retry bridge -> HTTP API -> validation -> PostgreSQL/Timescale -> digital twin",
+  "command": "python -m benchmarks.run_e2e_ingestion --admin-token $ADMIN_TOKEN"
+}

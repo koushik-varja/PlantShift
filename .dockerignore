@@ -1,0 +1,23 @@
+# Local secrets and source-control metadata must never enter the backend build context.
+.env
+.git
+.git/**
+
+# Local Python environments/caches.
+.venv
+venv
+__pycache__
+**/__pycache__
+.pytest_cache
+.mypy_cache
+.ruff_cache
+*.pyc
+*.db
+
+# Frontend local build/install artifacts (backend build context includes the repo root).
+frontend/node_modules
+frontend/dist
+
+# Runtime-generated artifacts that should be recreated or mounted/configured at runtime.
+ml/artifacts/*.joblib
+benchmarks/results/*.tmp

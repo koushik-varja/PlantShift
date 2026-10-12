@@ -1,0 +1,89 @@
+services:
+  postgres:
+    image: timescale/timescaledb:2.17.2-pg16
+    environment:
+      POSTGRES_DB: plantshift
+      POSTGRES_USER: plantshift
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - plantshift_pg:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/010-timescale.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U plantshift -d plantshift"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0.20
+    ports: ["127.0.0.1:1883:1883"]
+    volumes:
+      - ./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -h localhost -t '$$SYS/broker/version' -C 1 -W 2 >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://plantshift:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/plantshift
+      MQTT_HOST: mosquitto
+      MQTT_PORT: 1883
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?Set ADMIN_TOKEN in .env}
+      ALLOWED_ORIGINS: http://localhost:5173
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      mosquitto: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mqtt_bridge:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: ["python", "scripts/mqtt_bridge.py"]
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: 1883
+      BACKEND_TELEMETRY_URL: http://backend:8000/api/telemetry/batch
+      MQTT_BRIDGE_BUFFER: 1000
+      MQTT_BRIDGE_MAX_RETRIES: 4
+      MQTT_BRIDGE_BATCH_SIZE: 50
+      MQTT_BRIDGE_BATCH_FLUSH_MS: 50
+      MQTT_BRIDGE_METRICS_PORT: 9102
+    ports: ["127.0.0.1:9102:9102"]
+    depends_on:
+      backend: {condition: service_healthy}
+      mosquitto: {condition: service_healthy}
+
+  simulator:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: ["sh", "-c", "sleep 3 && python scripts/publish_simulated_telemetry.py --host mosquitto --port 1883 --sleep 0.01"]
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: 1883
+    depends_on:
+      mqtt_bridge: {condition: service_started}
+      mosquitto: {condition: service_healthy}
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8000
+    ports: ["127.0.0.1:5173:80"]
+    depends_on:
+      backend: {condition: service_healthy}
+
+volumes:
+  plantshift_pg:
